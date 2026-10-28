@@ -1,0 +1,20 @@
+# 依赖目录不提交
+node_modules
+# 构建产物不提交
+dist
+dist-ssr
+# 日志
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
