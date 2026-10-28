@@ -1,6 +1,6 @@
 <script setup>
 // ===== 行为：数据与函数（JS） =====
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 // 书单数据：一个变量装下整个页面（数据驱动）
 const books = ref([
@@ -24,6 +24,26 @@ const filteredBooks = computed(() => {
     return matchKw && matchCat
   })
 })
+
+// ===== 购物车计数器：改数据 → 页面自动变 =====
+const count = ref(0)
+function addToCart() {
+  count.value++
+}
+
+// ===== 暗色模式：切换 body 上的类名，颜色交给 CSS =====
+const isDark = ref(false)
+watch(isDark, (v) => {
+  document.body.classList.toggle('dark', v)
+})
+
+// ===== 回到顶部 =====
+function scrollTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// ===== v-bind 悬停高亮：记录悬停的是哪本书 =====
+const hoveredTitle = ref(null)
 </script>
 
 <template>
@@ -35,7 +55,7 @@ const filteredBooks = computed(() => {
       <a href="#">首页</a>
       <a href="#">检索</a>
       <a href="#">关于</a>
-      <button class="mode-btn">🌙 暗色</button>
+      <button class="mode-btn" @click="isDark = !isDark">{{ isDark ? '☀️ 亮色' : '🌙 暗色' }}</button>
     </nav>
   </header>
 
@@ -57,7 +77,7 @@ const filteredBooks = computed(() => {
 
         <button type="submit">检索</button>
       </form>
-      <span class="cart">购物车 (0)</span>
+      <span class="cart">购物车 ({{ count }})</span>
     </section>
 
     <div class="content-wrap">
@@ -66,14 +86,21 @@ const filteredBooks = computed(() => {
         <h2>新书推荐</h2>
         <div class="card-grid">
           <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
-          <article class="book-card" v-for="b in filteredBooks" :key="b.title">
+          <article
+            class="book-card"
+            v-for="b in filteredBooks"
+            :key="b.title"
+            :class="{ 'card-hover': hoveredTitle === b.title }"
+            @mouseenter="hoveredTitle = b.title"
+            @mouseleave="hoveredTitle = null"
+          >
             <span class="badge-new" v-if="b.isNew">新书</span>
             <div class="cover"></div>
             <h3>{{ b.title }}</h3>
             <p>作者：{{ b.author }}</p>
             <p class="price">¥{{ b.price.toFixed(2) }}</p>
             <p class="out-stock" v-if="!b.inStock">暂无库存</p>
-            <button class="addBtn" :disabled="!b.inStock">加入购物车</button>
+            <button class="addBtn" :disabled="!b.inStock" @click="addToCart">加入购物车</button>
           </article>
         </div>
       </section>
@@ -99,7 +126,7 @@ const filteredBooks = computed(() => {
   </main>
 
   <!-- 回到顶部按钮 -->
-  <button id="topBtn" class="back-to-top" title="回到顶部">↑</button>
+  <button id="topBtn" class="back-to-top" title="回到顶部" @click="scrollTop">↑</button>
 
   <!-- 页脚 -->
   <footer>
@@ -108,5 +135,10 @@ const filteredBooks = computed(() => {
 </template>
 
 <style scoped>
-/* 样式已整体引入全局 style.css，本组件无需重复书写 */
+/* 悬停高亮：由 :class 动态切换的类 */
+.card-hover {
+  border-color: #2f5d8a;
+  box-shadow: 0 4px 12px rgba(47, 93, 138, 0.25);
+  transform: translateY(-2px);
+}
 </style>
