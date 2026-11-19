@@ -1,22 +1,27 @@
 <script setup>
 // ===== 行为：数据与函数（JS） =====
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 // 组件化：两个积木——书卡与购物车面板
 import BookCard from './components/BookCard.vue'
 import CartPanel from './components/CartPanel.vue'
 
-// 书单数据：一个变量装下整个页面（数据是唯一真相）
-const books = ref([
-  { id: 1, title: '深入理解计算机系统', author: 'Randal E.Bryant', price: 59.0,  category: '计算机',   isNew: true,  inStock: true  },
-  { id: 2, title: '红楼梦',             author: '曹雪芹',          price: 45.0,  category: '文学小说', isNew: false, inStock: true  },
-  { id: 3, title: '三体',               author: '刘慈欣',          price: 72.0,  category: '文学小说', isNew: false, inStock: true  },
-  { id: 4, title: 'JavaScript高级程序设计', author: 'Nicholas C.Zakas', price: 89.0, category: '计算机', isNew: true,  inStock: true  },
-  { id: 5, title: '围城',               author: '钱钟书',          price: 38.0,  category: '文学小说', isNew: false, inStock: false },
-  { id: 6, title: '算法导论',           author: 'Thomas H.Cormen', price: 108.0, category: '计算机',   isNew: false, inStock: true  },
-  { id: 7, title: '万历十五年',         author: '黄仁宇',          price: 45.0,  category: '历史',     isNew: false, inStock: true  },
-  { id: 8, title: '人类简史',           author: '尤瓦尔·赫拉利',   price: 68.0,  category: '科普',     isNew: true,  inStock: true  },
-  { id: 9, title: '时间简史',           author: '史蒂芬·霍金',     price: 56.0,  category: '科普',     isNew: false, inStock: false },
-])
+// 书单数据：不再写死在页面里，改为来自 SQL Server（bookshop.dbo.books）
+// 由后端 server/index.js 的 GET /api/books 提供，字段已转成前端用的驼峰命名
+const books = ref([])
+const loading = ref(true)
+const loadError = ref('')
+
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/books')
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    books.value = await res.json()
+  } catch (e) {
+    loadError.value = e.message
+  } finally {
+    loading.value = false
+  }
+})
 
 // 搜索与分类状态（v-model 双向绑定）
 const keyword = ref('')
@@ -111,9 +116,13 @@ function scrollTop() {
       <section class="book-list">
         <h2>新书推荐</h2>
         <div class="card-grid">
-          <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
-          <!-- @add-to-cart 听自定义事件：子声明 emit，父 @ 监听并自己改数据 -->
-          <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" @add-to-cart="handleAdd" />
+          <p class="empty" v-if="loading">正在从数据库加载书目…</p>
+          <p class="empty" v-else-if="loadError">数据加载失败：{{ loadError }}（请确认后端已启动：cd server → npm start）</p>
+          <div v-else class="cards-wrap">
+            <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
+            <!-- @add-to-cart 听自定义事件：子声明 emit，父 @ 监听并自己改数据 -->
+            <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" @add-to-cart="handleAdd" />
+          </div>
         </div>
       </section>
 
@@ -152,4 +161,8 @@ function scrollTop() {
 
 <style scoped>
 /* 卡片样式在 BookCard.vue、购物车样式在 CartPanel.vue（scoped 隔离），本组件只负责拼装 */
+/* display:contents 让这层包裹盒不参与布局，卡片直接排在 .card-grid 里 */
+.cards-wrap {
+  display: contents;
+}
 </style>
