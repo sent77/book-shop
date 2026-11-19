@@ -37,11 +37,15 @@ book-shop/
 │  └─ package.json
 └─ src/
    ├─ main.js
-   ├─ App.vue            管数据（books 从接口来 / cart 在内存）+ 拼装
-   ├─ style.css          全局样式
+   ├─ App.vue            只管拼装 + 管数据（books 从接口来 / cart 在内存）
+   ├─ style.css          全局布局样式（骨架）
    └─ components/
-      ├─ BookCard.vue    props 收一本书，展示 + emit 上报加购
-      └─ CartPanel.vue   props 收明细与总价，展示 + emit 上报移除
+      ├─ AppHeader.vue   页头积木：logo、导航、暗色开关（props isDark / emit toggle-dark）
+      ├─ SearchBar.vue   搜索积木：关键字 + 分类 + 件数（props + emit update:）
+      ├─ BookCard.vue    书卡积木：props 收一本书，emit 上报加购
+      ├─ CartPanel.vue   购物车面板：props 收明细与总价，emit 上报移除
+      ├─ SideBar.vue     侧栏积木：分类导航/热榜/须知，emit 上报选中分类
+      └─ AppFooter.vue   页脚积木
 ```
 
 ## 实验3：数据库初始化

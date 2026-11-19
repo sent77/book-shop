@@ -1,3 +1,5 @@
+/* 全局样式：只负责页面骨架与布局
+   各组件自己的样式（页头/搜索/书卡/购物车/侧栏/页脚）都写在组件文件的 <style scoped> 里 */
 
 * {
     box-sizing: border-box;
@@ -26,118 +28,7 @@ main {
     flex: 1;
 }
 
-/* ---------- 页头 header ---------- */
-header {
-    background: #2f5d8a;
-    color: #fff;
-    padding: 14px 20px;
-    border-radius: 6px 6px 0 0;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-header h1 {
-    font-size: 24px;
-    letter-spacing: 2px;
-}
-
-nav {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-nav a:hover {
-    color: #ffd166;
-    text-decoration: underline;
-}
-
-/* 暗色模式切换按钮 */
-.mode-btn {
-    padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 14px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.mode-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* ---------- 检索区 form ---------- */
-.search-area {
-    padding: 14px;
-    margin: 14px 0;
-    background: #ffffff;
-    border: 1px solid #dde2e8;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.search-area label {
-    margin: 0 8px;
-    color: #555;
-}
-
-.search-area input,
-.search-area select,
-.search-area button {
-    padding: 6px 10px;
-    border: 1px solid #c8ccd2;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.search-area button {
-    background: #2f5d8a;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-.search-area button:hover {
-    background: #244a70;
-}
-
-/* 购物车计数 */
-.cart {
-    padding: 4px 12px;
-    background: #e04444;
-    color: #fff;
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-/* 当前搜索关键词实时显示 */
-.kw-tip {
-    margin: -6px 0 12px;
-    padding-left: 4px;
-    color: #666;
-    font-size: 13px;
-}
-
-.kw-tip strong {
-    color: #2f5d8a;
-}
-
-/* ---------- 内容区：book-list + sidebar ---------- */
+/* ---------- 内容区：book-list + side-column ---------- */
 .content-wrap {
     display: flex;
     gap: 20px;
@@ -162,7 +53,7 @@ nav a:hover {
     gap: 20px;
 }
 
-/* 搜索无结果提示 */
+/* 搜索无结果 / 加载中提示 */
 .empty {
     width: 100%;
     padding: 40px;
@@ -178,44 +69,6 @@ nav a:hover {
 .side-column {
     width: 250px;
     flex-shrink: 0;
-}
-
-/* ---------- 侧栏 ---------- */
-.sidebar {
-    padding: 14px;
-    background: #ffffff;
-    border: 1px solid #dde2e8;
-    border-radius: 6px;
-}
-
-.sidebar h3 {
-    margin: 10px 0 6px;
-    padding-bottom: 4px;
-    color: #2f5d8a;
-    border-bottom: 1px dashed #c8ccd2;
-}
-
-.sidebar ul {
-    padding-left: 20px;
-}
-
-.sidebar li {
-    margin: 3px 0;
-    cursor: pointer;
-}
-
-.sidebar li:hover {
-    color: #2f5d8a;
-}
-
-/* ---------- 页脚 ---------- */
-footer {
-    margin-top: 20px;
-    padding: 14px;
-    background: #2f5d8a;
-    color: #fff;
-    text-align: center;
-    border-radius: 0 0 6px 6px;
 }
 
 /* ---------- 回到顶部按钮 ---------- */
@@ -240,44 +93,22 @@ footer {
 }
 
 /* ================================================================
-   暗色模式：body.dark 时整体切换（卡片暗色样式在 BookCard.vue 内）
+   暗色模式（组件内部颜色在各自 scoped 样式里）
    ================================================================ */
 body.dark {
     background: #1a2230;
     color: #e5e7eb;
 }
 
-body.dark .search-area,
-body.dark .sidebar,
 body.dark .empty {
     background: #253040;
     border-color: #4a5568;
     color: #e5e7eb;
 }
 
-body.dark .sidebar li,
-body.dark .search-area label {
-    color: #b0b8c4;
-}
-
-body.dark .book-list h2,
-body.dark .sidebar h3 {
+body.dark .book-list h2 {
     color: #7ab8ff;
     border-color: #7ab8ff;
-}
-
-body.dark header,
-body.dark footer {
-    background: #253040;
-    color: #e5e7eb;
-}
-
-body.dark .search-area button {
-    background: #3a6ea5;
-}
-
-body.dark .search-area button:hover {
-    background: #2d5a8c;
 }
 
 body.dark .back-to-top {
@@ -288,20 +119,8 @@ body.dark .back-to-top:hover {
     background: #2d5a8c;
 }
 
-body.dark .cart {
-    background: #b03030;
-}
-
-body.dark .kw-tip {
-    color: #b0b8c4;
-}
-
-body.dark .kw-tip strong {
-    color: #7ab8ff;
-}
-
 /* ================================================================
-   响应式媒体查询
+   响应式媒体查询（组件内部的响应式在各自 scoped 样式里）
    ================================================================ */
 
 /* 手机：≤ 600px */
@@ -312,16 +131,6 @@ body.dark .kw-tip strong {
 
     .side-column {
         width: 100%;
-    }
-
-    header {
-        flex-direction: column;
-        gap: 8px;
-        text-align: center;
-    }
-
-    nav {
-        gap: 16px;
     }
 
     .back-to-top {

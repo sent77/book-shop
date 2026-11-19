@@ -1,9 +1,13 @@
 <script setup>
 // ===== 行为：数据与函数（JS） =====
 import { ref, computed, watch, onMounted } from 'vue'
-// 组件化：两个积木——书卡与购物车面板
+// 首页 = 一堆积木：页头、搜索、书卡、购物车、侧栏、页脚，App.vue 只管拼装和管数据
+import AppHeader from './components/AppHeader.vue'
+import SearchBar from './components/SearchBar.vue'
 import BookCard from './components/BookCard.vue'
 import CartPanel from './components/CartPanel.vue'
+import SideBar from './components/SideBar.vue'
+import AppFooter from './components/AppFooter.vue'
 
 // 书单数据：不再写死在页面里，改为来自 SQL Server（bookshop.dbo.books）
 // 由后端 server/index.js 的 GET /api/books 提供，字段已转成前端用的驼峰命名
@@ -23,7 +27,7 @@ onMounted(async () => {
   }
 })
 
-// 搜索与分类状态（v-model 双向绑定）
+// 搜索与分类状态（v-model 双向绑定；状态仍然住在父组件）
 const keyword = ref('')
 const category = ref('全部')
 
@@ -75,44 +79,14 @@ function scrollTop() {
 </script>
 
 <template>
-  <!-- ===== 结构：页面长什么样（HTML） ===== -->
-  <!-- 页头：logo 与导航两端对齐 -->
-  <header>
-    <h1>校园图书屋</h1>
-    <nav>
-      <a href="#">首页</a>
-      <a href="#">检索</a>
-      <a href="#">关于</a>
-      <button class="mode-btn" @click="isDark = !isDark">{{ isDark ? '☀️ 亮色' : '🌙 暗色' }}</button>
-    </nav>
-  </header>
+  <!-- ===== 结构：只负责拼装（每个积木自己长什么样、穿什么衣服都在自己文件里） ===== -->
+  <AppHeader :is-dark="isDark" @toggle-dark="isDark = !isDark" />
 
   <main>
-    <!-- 检索区 -->
-    <section class="search-area">
-      <form action="/search" method="get" @submit.prevent>
-        <label for="kw">书名关键字</label>
-        <input type="text" id="kw" name="keyword" required placeholder="请输入书名" v-model="keyword" />
-
-        <label for="type">图书分类</label>
-        <select id="type" name="type" v-model="category">
-          <option value="全部">全部</option>
-          <option value="计算机">计算机</option>
-          <option value="文学小说">文学小说</option>
-          <option value="历史">历史</option>
-          <option value="科普">科普</option>
-        </select>
-
-        <button type="submit">检索</button>
-      </form>
-      <span class="cart">购物车 ({{ count }})</span>
-    </section>
-
-    <!-- 关键词实时显示：输入框一变这里立刻跟着变（v-model 的直观证据） -->
-    <p class="kw-tip" v-if="keyword">当前关键词：<strong>{{ keyword }}</strong></p>
+    <!-- 搜索积木：组件上的 v-model:keyword 等价于 :keyword + @update:keyword -->
+    <SearchBar v-model:keyword="keyword" v-model:category="category" :count="count" />
 
     <div class="content-wrap">
-      <!-- 新书推荐：v-for 作用在组件标签上，每本书自动打一个包裹递给 BookCard -->
       <section class="book-list">
         <h2>新书推荐</h2>
         <div class="card-grid">
@@ -129,23 +103,7 @@ function scrollTop() {
       <!-- 右侧列：购物车面板（兄弟组件，与 BookCard 通过父组件这座桥联动） + 侧栏 -->
       <div class="side-column">
         <CartPanel :cart="cart" :total="total" @remove-from-cart="removeFromCart" />
-
-        <aside class="sidebar">
-          <h3>分类导航</h3>
-          <ul id="categoryNav">
-            <li @click="category = '计算机'">计算机</li>
-            <li @click="category = '文学小说'">文学小说</li>
-            <li @click="category = '历史'">历史</li>
-            <li @click="category = '科普'">科普</li>
-          </ul>
-          <h3>本周热榜</h3>
-          <ul>
-            <li>三体</li>
-            <li>红楼梦</li>
-          </ul>
-          <h3>借阅须知</h3>
-          <p>每本书借阅期限30天，请按时归还。</p>
-        </aside>
+        <SideBar @select-category="category = $event" />
       </div>
     </div>
   </main>
@@ -153,14 +111,11 @@ function scrollTop() {
   <!-- 回到顶部按钮 -->
   <button id="topBtn" class="back-to-top" title="回到顶部" @click="scrollTop">↑</button>
 
-  <!-- 页脚 -->
-  <footer>
-    <p>版权所有 © 2026</p>
-  </footer>
+  <AppFooter />
 </template>
 
 <style scoped>
-/* 卡片样式在 BookCard.vue、购物车样式在 CartPanel.vue（scoped 隔离），本组件只负责拼装 */
+/* 本组件只剩布局：各积木的样式都在自己文件里（scoped 隔离） */
 /* display:contents 让这层包裹盒不参与布局，卡片直接排在 .card-grid 里 */
 .cards-wrap {
   display: contents;
