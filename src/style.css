@@ -162,10 +162,14 @@ nav a:hover {
     border-radius: 6px;
 }
 
-/* ---------- 侧栏 ---------- */
-.sidebar {
+/* ---------- 右侧列（购物车面板 + 侧栏） ---------- */
+.side-column {
     width: 250px;
     flex-shrink: 0;
+}
+
+/* ---------- 侧栏 ---------- */
+.sidebar {
     padding: 14px;
     background: #ffffff;
     border: 1px solid #dde2e8;
@@ -286,7 +290,7 @@ body.dark .cart {
         flex-direction: column;
     }
 
-    .sidebar {
+    .side-column {
         width: 100%;
     }
 
@@ -311,7 +315,7 @@ body.dark .cart {
 
 /* 平板：601–991px */
 @media (min-width: 601px) and (max-width: 991px) {
-    .sidebar {
+    .side-column {
         width: 200px;
     }
 }

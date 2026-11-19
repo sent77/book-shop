@@ -1,8 +1,9 @@
 <script setup>
 // ===== 行为：数据与函数（JS） =====
 import { ref, computed, watch } from 'vue'
-// 组件化第二步：import 进来，模板里就能当标签用（script setup 中 import 即注册）
+// 组件化：两个积木——书卡与购物车面板
 import BookCard from './components/BookCard.vue'
+import CartPanel from './components/CartPanel.vue'
 
 // 书单数据：一个变量装下整个页面（数据是唯一真相）
 const books = ref([
@@ -12,7 +13,6 @@ const books = ref([
   { id: 4, title: 'JavaScript高级程序设计', author: 'Nicholas C.Zakas', price: 89.0, category: '计算机', isNew: true,  inStock: true  },
   { id: 5, title: '围城',               author: '钱钟书',          price: 38.0,  category: '文学小说', isNew: false, inStock: false },
   { id: 6, title: '算法导论',           author: 'Thomas H.Cormen', price: 108.0, category: '计算机',   isNew: false, inStock: true  },
-  // 加分项：补 3 本测试数据
   { id: 7, title: '万历十五年',         author: '黄仁宇',          price: 45.0,  category: '历史',     isNew: false, inStock: true  },
   { id: 8, title: '人类简史',           author: '尤瓦尔·赫拉利',   price: 68.0,  category: '科普',     isNew: true,  inStock: true  },
   { id: 9, title: '时间简史',           author: '史蒂芬·霍金',     price: 56.0,  category: '科普',     isNew: false, inStock: false },
@@ -31,13 +31,30 @@ const filteredBooks = computed(() => {
   })
 })
 
-// 购物车件数（第 8 次课通过 emit 接通）
-const count = ref(0)
+// ===== 状态提升：购物车明细放在父组件，BookCard 与 CartPanel 都从这取 =====
+// 用数组不用数字：数组还能回答"哪几本、各几件"
+const cart = ref([])
 
-// 谁的数据谁负责改：count 住在 App.vue，处理函数也写在这里
+// 收到子组件的上报：已有这本书就数量加一，没有就复制一份入车
 function handleAdd(book) {
-  count.value++
-  console.log('收到加购事件：', book.title, '当前件数：', count.value)
+  const found = cart.value.find((it) => it.id === book.id)
+  if (found) {
+    found.qty++
+  } else {
+    cart.value.push({ ...book, qty: 1 })
+  }
+  console.log('收到加购事件：', book.title, '当前购物车：', cart.value)
+}
+
+// 件数由明细派生：永远不会和明细对不上
+const count = computed(() => cart.value.reduce((sum, it) => sum + it.qty, 0))
+
+// 总价：computed 会缓存，cart 不变就不重算
+const total = computed(() => cart.value.reduce((sum, it) => sum + it.price * it.qty, 0))
+
+// 移除：子组件只上报 id，父组件用 filter 真正删除
+function removeFromCart(id) {
+  cart.value = cart.value.filter((it) => it.id !== id)
 }
 
 // ===== 暗色模式：切换 body 上的类名，颜色交给 CSS =====
@@ -92,28 +109,32 @@ function scrollTop() {
         <h2>新书推荐</h2>
         <div class="card-grid">
           <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
-          <!-- @add-to-cart 听自定义事件，写法与 @click 一样；事件名统一用短横线 -->
+          <!-- @add-to-cart 听自定义事件：子声明 emit，父 @ 监听并自己改数据 -->
           <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" @add-to-cart="handleAdd" />
         </div>
       </section>
 
-      <!-- 侧边栏 -->
-      <aside class="sidebar">
-        <h3>分类导航</h3>
-        <ul id="categoryNav">
-          <li @click="category = '计算机'">计算机</li>
-          <li @click="category = '文学小说'">文学小说</li>
-          <li @click="category = '历史'">历史</li>
-          <li @click="category = '科普'">科普</li>
-        </ul>
-        <h3>本周热榜</h3>
-        <ul>
-          <li>三体</li>
-          <li>红楼梦</li>
-        </ul>
-        <h3>借阅须知</h3>
-        <p>每本书借阅期限30天，请按时归还。</p>
-      </aside>
+      <!-- 右侧列：购物车面板（兄弟组件，与 BookCard 通过父组件这座桥联动） + 侧栏 -->
+      <div class="side-column">
+        <CartPanel :cart="cart" :total="total" @remove-from-cart="removeFromCart" />
+
+        <aside class="sidebar">
+          <h3>分类导航</h3>
+          <ul id="categoryNav">
+            <li @click="category = '计算机'">计算机</li>
+            <li @click="category = '文学小说'">文学小说</li>
+            <li @click="category = '历史'">历史</li>
+            <li @click="category = '科普'">科普</li>
+          </ul>
+          <h3>本周热榜</h3>
+          <ul>
+            <li>三体</li>
+            <li>红楼梦</li>
+          </ul>
+          <h3>借阅须知</h3>
+          <p>每本书借阅期限30天，请按时归还。</p>
+        </aside>
+      </div>
     </div>
   </main>
 
@@ -127,5 +148,5 @@ function scrollTop() {
 </template>
 
 <style scoped>
-/* 卡片样式已搬入 BookCard.vue（scoped 隔离），本组件只负责拼装 */
+/* 卡片样式在 BookCard.vue、购物车样式在 CartPanel.vue（scoped 隔离），本组件只负责拼装 */
 </style>
