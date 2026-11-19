@@ -4,6 +4,9 @@ import { ref } from 'vue'
 // 收货地址：父组件把"一本书"的包裹递进来
 defineProps(['book'])
 
+// 发货单：声明本组件会喊出哪些事件（子声明 emit，父 @ 监听）
+const emit = defineEmits(['add-to-cart'])
+
 // 悬停高亮：组件内部自治的小状态
 const hovered = ref(false)
 </script>
@@ -23,7 +26,8 @@ const hovered = ref(false)
     <!-- 组件自治：有货/缺货标记写在组件里，父组件不用管 -->
     <p class="in-stock" v-if="book.inStock">有货</p>
     <p class="out-stock" v-else>缺货</p>
-    <button class="addBtn" :disabled="!book.inStock">加入购物车</button>
+    <!-- 子组件只负责喊一声"有人加购了"，顺便把书递过去；怎么改数据是父组件的事 -->
+    <button class="addBtn" :disabled="!book.inStock" @click="emit('add-to-cart', book)">加入购物车</button>
   </article>
 </template>
 

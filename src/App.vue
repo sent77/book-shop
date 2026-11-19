@@ -31,8 +31,14 @@ const filteredBooks = computed(() => {
   })
 })
 
-// 购物车件数（计数在第 8 次课通过 emit 接通）
+// 购物车件数（第 8 次课通过 emit 接通）
 const count = ref(0)
+
+// 谁的数据谁负责改：count 住在 App.vue，处理函数也写在这里
+function handleAdd(book) {
+  count.value++
+  console.log('收到加购事件：', book.title, '当前件数：', count.value)
+}
 
 // ===== 暗色模式：切换 body 上的类名，颜色交给 CSS =====
 const isDark = ref(false)
@@ -86,7 +92,8 @@ function scrollTop() {
         <h2>新书推荐</h2>
         <div class="card-grid">
           <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
-          <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" />
+          <!-- @add-to-cart 听自定义事件，写法与 @click 一样；事件名统一用短横线 -->
+          <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" @add-to-cart="handleAdd" />
         </div>
       </section>
 
