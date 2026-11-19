@@ -125,6 +125,18 @@ nav a:hover {
     white-space: nowrap;
 }
 
+/* 当前搜索关键词实时显示 */
+.kw-tip {
+    margin: -6px 0 12px;
+    padding-left: 4px;
+    color: #666;
+    font-size: 13px;
+}
+
+.kw-tip strong {
+    color: #2f5d8a;
+}
+
 /* ---------- 内容区：book-list + sidebar ---------- */
 .content-wrap {
     display: flex;
@@ -278,6 +290,14 @@ body.dark .back-to-top:hover {
 
 body.dark .cart {
     background: #b03030;
+}
+
+body.dark .kw-tip {
+    color: #b0b8c4;
+}
+
+body.dark .kw-tip strong {
+    color: #7ab8ff;
 }
 
 /* ================================================================

@@ -103,6 +103,9 @@ function scrollTop() {
       <span class="cart">购物车 ({{ count }})</span>
     </section>
 
+    <!-- 关键词实时显示：输入框一变这里立刻跟着变（v-model 的直观证据） -->
+    <p class="kw-tip" v-if="keyword">当前关键词：<strong>{{ keyword }}</strong></p>
+
     <div class="content-wrap">
       <!-- 新书推荐：v-for 作用在组件标签上，每本书自动打一个包裹递给 BookCard -->
       <section class="book-list">
