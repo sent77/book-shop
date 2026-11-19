@@ -44,8 +44,29 @@ const filteredBooks = computed(() => {
 // 用数组不用数字：数组还能回答"哪几本、各几件"
 const cart = ref([])
 
-// 收到子组件的上报：已有这本书就数量加一，没有就复制一份入车
-function handleAdd(book) {
+// 收到子组件的上报：先写数据库（库存-1、销量+1），成功了再加进购物车
+async function handleAdd(book) {
+  // 1) 写数据库：POST /api/books/:id/add，后端在事务里 stock - 1、sales + 1
+  try {
+    const res = await fetch(`/api/books/${book.id}/add`, { method: 'POST' })
+    const data = await res.json()
+    if (!res.ok) {
+      alert(data.error || '加购失败')
+      return
+    }
+    // 把数据库返回的新数字同步到页面上这本书（卡片上的库存/已加购立刻变）
+    const row = books.value.find((b) => b.id === book.id)
+    if (row) {
+      row.stock = data.stock
+      row.sales = data.sales
+      row.inStock = data.stock > 0
+    }
+  } catch (e) {
+    alert('加购失败：' + e.message)
+    return
+  }
+
+  // 2) 再加进购物车（购物车仍在浏览器内存，刷新会丢——这是第8次课的小实验结论）
   const found = cart.value.find((it) => it.id === book.id)
   if (found) {
     found.qty++

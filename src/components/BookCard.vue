@@ -26,6 +26,8 @@ const hovered = ref(false)
     <!-- 组件自治：有货/缺货标记写在组件里，父组件不用管 -->
     <p class="in-stock" v-if="book.inStock">有货</p>
     <p class="out-stock" v-else>缺货</p>
+    <!-- 库存与销量来自数据库：加购后后端 stock-1、sales+1，这里跟着刷新 -->
+    <p class="stock-line">库存 {{ book.stock }} 本 · 已加购 {{ book.sales }} 次</p>
     <!-- 子组件只负责喊一声"有人加购了"，顺便把书递过去；怎么改数据是父组件的事 -->
     <button class="addBtn" :disabled="!book.inStock" @click="emit('add-to-cart', book)">加入购物车</button>
   </article>
@@ -100,6 +102,17 @@ p {
 .is-out {
   opacity: 0.6;
   filter: grayscale(0.5);
+}
+
+/* 库存与销量（数字来自数据库） */
+.stock-line {
+  margin-top: 4px;
+  color: #888 !important;
+  font-size: 12px !important;
+}
+
+body.dark .stock-line {
+  color: #7d8798 !important;
 }
 
 /* 加入购物车按钮 */

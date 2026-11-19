@@ -65,7 +65,7 @@ sqlcmd -S "localhost\SQLEXPRESS" -E -C -f 65001 -i 01_数据库/init.sql
 
 ## 第 8 次课必做小实验：数据住在哪里
 
-> 我认为书单数据住在 **SQL Server 的 `bookshop.dbo.books` 表里**，所以刷新页面书还在；
+> 我认为书单数据住在 **SQL Server 的 `bookshop.dbo.books` 表里**，库存 `stock` 和销量 `sales` 也在表里，所以刷新页面书还在、加购次数也还在；
 > 但购物车 `cart` 住在 **浏览器内存（Vue 的 ref）**，没有写 localStorage 也没有存数据库，所以 **刷新会丢**。
 
 ## 一次加购的完整链路（数据库版）
@@ -88,6 +88,27 @@ sqlcmd -S "localhost\SQLEXPRESS" -E -C -f 65001 -i 01_数据库/init.sql
 | `in_stock` | `inStock` | BIT → 布尔，控制「有货/缺货」与整卡置灰 |
 | `is_new` | `isNew` | BIT → 布尔，控制「新书」角标 |
 | `category` | `category` | 扩展列，保留分类筛选 |
+| `stock` | `stock` | 扩展列：库存数量，加购时 -1，为 0 即缺货 |
+| `sales` | `sales` | 扩展列：已加购次数，加购时 +1 |
+
+## 加购会写回数据库
+
+点「加入购物车」不只是改内存，数字会真正落库：
+
+1. 前端 `handleAdd` 先 `POST /api/books/:id/add`；
+2. 后端开事务 `UPDATE dbo.books SET stock = stock - 1, sales = sales + 1 WHERE id = @id AND stock > 0`，再查出新数字提交；
+3. 前端把返回的 `stock / sales` 同步到页面（卡片上「库存 N 本 · 已加购 N 次」立刻变）；
+4. 刷新页面 → 库存与销量仍是数据库里的新值；购物车明细仍归零（它在浏览器内存）。
+
+库存为 0 的书按钮置灰、后端也会拒绝（409 库存不足），不会扣成负数。
+
+### 接口清单
+
+| 方法 | 路径 | 作用 |
+|---|---|---|
+| GET | `/api/books` | 读书单（含 stock / sales，`inStock = stock > 0`） |
+| POST | `/api/books/:id/add` | 加购：事务里库存 -1、销量 +1，返回新数字 |
+| GET | `/api/health` | 健康检查 |
 
 ## 交互功能清单
 
