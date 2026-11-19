@@ -143,88 +143,11 @@ nav a:hover {
     border-left: 4px solid #2f5d8a;
 }
 
-/* 卡片网格容器（由 JS 渲染） */
+/* 卡片网格容器：卡片样式在 BookCard.vue 内（scoped） */
 .card-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-}
-
-.book-card {
-    flex: 0 0 280px;
-    padding: 12px;
-    background: #ffffff;
-    border: 1px solid #e0e3e8;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    position: relative;
-}
-
-.book-card .cover {
-    height: 130px;
-    margin-bottom: 10px;
-    background: linear-gradient(135deg, #dce6f1 0%, #b6cbe4 100%);
-    border: 1px solid #cfd6df;
-    border-radius: 4px;
-}
-
-.book-card h3 {
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.book-card p {
-    font-size: 13px;
-    color: #666;
-}
-
-.book-card .price {
-    margin-top: 6px;
-    color: #e04444;
-    font-size: 15px;
-    font-weight: bold;
-}
-
-/* 新书角标 */
-.badge-new {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-    padding: 2px 10px;
-    background: #e04444;
-    color: #fff;
-    font-size: 12px;
-    border-radius: 10px;
-}
-
-/* 暂无库存标记 */
-.out-stock {
-    margin-top: 4px;
-    color: #999 !important;
-    font-size: 12px !important;
-}
-
-/* 加入购物车按钮 */
-.addBtn {
-    margin-top: 8px;
-    padding: 6px 16px;
-    background: #2f5d8a;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.addBtn:hover:not(:disabled) {
-    background: #244a70;
-}
-
-.addBtn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
 }
 
 /* 搜索无结果提示 */
@@ -301,7 +224,7 @@ footer {
 }
 
 /* ================================================================
-   暗色模式：body.dark 时整体切换
+   暗色模式：body.dark 时整体切换（卡片暗色样式在 BookCard.vue 内）
    ================================================================ */
 body.dark {
     background: #1a2230;
@@ -309,7 +232,6 @@ body.dark {
 }
 
 body.dark .search-area,
-body.dark .book-card,
 body.dark .sidebar,
 body.dark .empty {
     background: #253040;
@@ -317,7 +239,6 @@ body.dark .empty {
     color: #e5e7eb;
 }
 
-body.dark .book-card p,
 body.dark .sidebar li,
 body.dark .search-area label {
     color: #b0b8c4;
@@ -329,24 +250,17 @@ body.dark .sidebar h3 {
     border-color: #7ab8ff;
 }
 
-body.dark .cover {
-    background: linear-gradient(135deg, #3a4a60 0%, #2a3a50 100%);
-    border-color: #4a5568;
-}
-
 body.dark header,
 body.dark footer {
     background: #253040;
     color: #e5e7eb;
 }
 
-body.dark .search-area button,
-body.dark .addBtn {
+body.dark .search-area button {
     background: #3a6ea5;
 }
 
-body.dark .search-area button:hover,
-body.dark .addBtn:hover:not(:disabled) {
+body.dark .search-area button:hover {
     background: #2d5a8c;
 }
 
@@ -376,11 +290,6 @@ body.dark .cart {
         width: 100%;
     }
 
-    .book-card {
-        flex: 1 1 100%;
-        min-width: 0;
-    }
-
     header {
         flex-direction: column;
         gap: 8px;
@@ -404,10 +313,5 @@ body.dark .cart {
 @media (min-width: 601px) and (max-width: 991px) {
     .sidebar {
         width: 200px;
-    }
-
-    .book-card {
-        flex: 0 0 280px;
-        min-width: 0;
     }
 }

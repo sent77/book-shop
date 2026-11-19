@@ -1,15 +1,21 @@
 <script setup>
 // ===== 行为：数据与函数（JS） =====
 import { ref, computed, watch } from 'vue'
+// 组件化第二步：import 进来，模板里就能当标签用（script setup 中 import 即注册）
+import BookCard from './components/BookCard.vue'
 
-// 书单数据：一个变量装下整个页面（数据驱动）
+// 书单数据：一个变量装下整个页面（数据是唯一真相）
 const books = ref([
-  { title: '深入理解计算机系统', author: 'Randal E.Bryant', price: 59.0,  category: '计算机',   isNew: true,  inStock: true  },
-  { title: '红楼梦',             author: '曹雪芹',          price: 45.0,  category: '文学小说', isNew: false, inStock: true  },
-  { title: '三体',               author: '刘慈欣',          price: 72.0,  category: '文学小说', isNew: false, inStock: true  },
-  { title: 'JavaScript高级程序设计', author: 'Nicholas C.Zakas', price: 89.0, category: '计算机', isNew: true,  inStock: true  },
-  { title: '围城',               author: '钱钟书',          price: 38.0,  category: '文学小说', isNew: false, inStock: false },
-  { title: '算法导论',           author: 'Thomas H.Cormen', price: 108.0, category: '计算机',   isNew: false, inStock: true  },
+  { id: 1, title: '深入理解计算机系统', author: 'Randal E.Bryant', price: 59.0,  category: '计算机',   isNew: true,  inStock: true  },
+  { id: 2, title: '红楼梦',             author: '曹雪芹',          price: 45.0,  category: '文学小说', isNew: false, inStock: true  },
+  { id: 3, title: '三体',               author: '刘慈欣',          price: 72.0,  category: '文学小说', isNew: false, inStock: true  },
+  { id: 4, title: 'JavaScript高级程序设计', author: 'Nicholas C.Zakas', price: 89.0, category: '计算机', isNew: true,  inStock: true  },
+  { id: 5, title: '围城',               author: '钱钟书',          price: 38.0,  category: '文学小说', isNew: false, inStock: false },
+  { id: 6, title: '算法导论',           author: 'Thomas H.Cormen', price: 108.0, category: '计算机',   isNew: false, inStock: true  },
+  // 加分项：补 3 本测试数据
+  { id: 7, title: '万历十五年',         author: '黄仁宇',          price: 45.0,  category: '历史',     isNew: false, inStock: true  },
+  { id: 8, title: '人类简史',           author: '尤瓦尔·赫拉利',   price: 68.0,  category: '科普',     isNew: true,  inStock: true  },
+  { id: 9, title: '时间简史',           author: '史蒂芬·霍金',     price: 56.0,  category: '科普',     isNew: false, inStock: false },
 ])
 
 // 搜索与分类状态（v-model 双向绑定）
@@ -25,11 +31,8 @@ const filteredBooks = computed(() => {
   })
 })
 
-// ===== 购物车计数器：改数据 → 页面自动变 =====
+// 购物车件数（计数在第 8 次课通过 emit 接通）
 const count = ref(0)
-function addToCart() {
-  count.value++
-}
 
 // ===== 暗色模式：切换 body 上的类名，颜色交给 CSS =====
 const isDark = ref(false)
@@ -41,9 +44,6 @@ watch(isDark, (v) => {
 function scrollTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
-
-// ===== v-bind 悬停高亮：记录悬停的是哪本书 =====
-const hoveredTitle = ref(null)
 </script>
 
 <template>
@@ -81,27 +81,12 @@ const hoveredTitle = ref(null)
     </section>
 
     <div class="content-wrap">
-      <!-- 新书推荐：v-for 一张卡模板套所有书 -->
+      <!-- 新书推荐：v-for 作用在组件标签上，每本书自动打一个包裹递给 BookCard -->
       <section class="book-list">
         <h2>新书推荐</h2>
         <div class="card-grid">
           <p class="empty" v-if="filteredBooks.length === 0">没有找到相关图书</p>
-          <article
-            class="book-card"
-            v-for="b in filteredBooks"
-            :key="b.title"
-            :class="{ 'card-hover': hoveredTitle === b.title }"
-            @mouseenter="hoveredTitle = b.title"
-            @mouseleave="hoveredTitle = null"
-          >
-            <span class="badge-new" v-if="b.isNew">新书</span>
-            <div class="cover"></div>
-            <h3>{{ b.title }}</h3>
-            <p>作者：{{ b.author }}</p>
-            <p class="price">¥{{ b.price.toFixed(2) }}</p>
-            <p class="out-stock" v-if="!b.inStock">暂无库存</p>
-            <button class="addBtn" :disabled="!b.inStock" @click="addToCart">加入购物车</button>
-          </article>
+          <BookCard v-for="b in filteredBooks" :key="b.id" :book="b" />
         </div>
       </section>
 
@@ -135,10 +120,5 @@ const hoveredTitle = ref(null)
 </template>
 
 <style scoped>
-/* 悬停高亮：由 :class 动态切换的类 */
-.card-hover {
-  border-color: #2f5d8a;
-  box-shadow: 0 4px 12px rgba(47, 93, 138, 0.25);
-  transform: translateY(-2px);
-}
+/* 卡片样式已搬入 BookCard.vue（scoped 隔离），本组件只负责拼装 */
 </style>
